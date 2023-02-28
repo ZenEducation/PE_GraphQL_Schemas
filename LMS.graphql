@@ -47,22 +47,6 @@ type LMS_Course_Chapter
 
 
 
-type Student @model
-@auth(rules: [{ allow: owner, operations: [create, delete, update] }])
-{
-  userId: ID! @primaryKey
-  degree: String
-  college: String
-  passingYear: Int
-  coursesEnrolled: [Course] @manyToMany(relationName: "enrolledInCourse")
-  chaptersCompleted: [Chapter] @manyToMany(relationName: "chapterCompletedBy")
-  examsEnrolled: [Exam] @manyToMany(relationName: "enrolledForExam")
-  examsAttemped: [Exam] @manyToMany(relationName: "examsAttemped")
-}
-
-
-
-
 type Course
 @model @searchable
 {
@@ -89,16 +73,6 @@ type Course
     UserId: ID! @index(name: "coursesByUser")#courses created by user
 }
 
-type LMSCourseInstructor @model
-@auth(rules: [{ allow: owner, operations: [create, delete, update] }])
-{
-  userId: ID! @primaryKey
-  description: String!
-  education: [Education]
-  title: String!
-  courses: [Course] @hasMany(indexName: "coursesByUser")
-  experience: [Experience]
-}
 type CourseTags
 @model @searchable{
     id: ID!

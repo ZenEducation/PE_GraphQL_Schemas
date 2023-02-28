@@ -1,70 +1,74 @@
-
 enum UserType {
-    Guest
-    Student
-    Guardian
-    Educator
-    EduCarer
-    Intern
-    InternApplicant
-    JobApplicant 
-    Telecaller
-    LMSInstructor
-    Employee
-    Admin
-    Vendor
-    SuperAdmin
-    Investor
+  Guest
+  Student
+  Guardian
+  Educator
+  EduCarer
+  Intern
+  InternApplicant
+  JobApplicant
+  Telecaller
+  LMSInstructor
+  Employee
+  Admin
+  Vendor
+  SuperAdmin
+  Investor
 }
-
-# AuthInfo correcponds to the user info that we have stored in Cognito
+type User_PersonalProject {
+  name: String
+  description: String
+  links: [String]
+}
+type User_Experience {
+  companyName: String
+  position: String
+  jobDescription: String
+  joiningDate: AWSDate
+  leavingDate: AWSDate
+}
+# AuthInfo corresponds to the user info that we have stored in Cognito
 # Create a 1to1 relation with User model
-type AuthInfo @model { 
-id: ID!
-email: [String]
-createdAt: [String]
-phoneNum: [String]
-updatedAt: [String]
-
+type AuthInfo @model {
+  userId: ID! @primaryKey
+  email: String!
+  phoneNum: [String]
 }
-
 # Its the explicit store inside the database for the Permissions associated with an authenticated user
 type AuthUserPermission @model {
-allowCourseCreation: Boolean
-email: String
-allowEduCares: Boolean
-altPhoneNum: String
+  userId: ID! @primaryKey
+  allowCourseCreation: Boolean
+  email: String
+  allowEduCares: Boolean
+  altPhoneNum: String
 }
-
-
-
-type User 
-@auth(rules: [{ allow: owner, operations: [create, delete, update] }]) 
-@model
-  {
-    id: ID!
-    image: String
-    name: String!
-    email: String!
-    type: UserType!
-    address: String
-    pinCode: Int
-    studentInfo: Student @hasOne (fields: ["id"])
-    guardianInfo: Guardian @hasOne (fields: ["id"])
-    educatorInfo: Educator @hasOne (fields: ["id"])
-    eduCarerInfo: EduCarer @hasOne (fields: ["id"])
-    internInfo: Intern @hasOne (fields: ["id"])
-    internApplicantInfo: InternApplicant @hasOne (fields: ["id"])
-    employeeInfo: Employee @hasOne (fields: ["id"])
-    jobApplicantInfo: JobApplicant @hasOne (fields: ["id"])
-    adminInfo: Admin @hasOne (fields: ["id"])
-    vendorInfo:Vendor @hasOne (fields: ["id"])
-    superAdminInfo:SuperAdmin @hasOne (fields: ["id"])
-    investorInfo: Investor @hasOne (fields: ["id"])
-    #kanban
-    projects: [Project] @manyToMany(relationName: "userProjects")
-    tasks: [Task] @manyToMany(relationName: "userAssignedTasks")
-  }
+type User
+  @auth(rules: [{ allow: owner, operations: [create, delete, update] }])
+  @model {
+  id: ID!
+  image: String
+  name: String!
+  type: UserType!
+  address: String
+  pinCode: Int
+  authInfo: AuthInfo @hasOne(fields: ["id"])
+  authUserPermission: AuthUserPermission @hasOne(fields: ["id"])
+  studentInfo: Student @hasOne(fields: ["id"])
+  guardianInfo: Guardian @hasOne(fields: ["id"])
+  educatorInfo: Educator @hasOne(fields: ["id"])
+  eduCarerInfo: EduCarer @hasOne(fields: ["id"])
+  internInfo: Intern @hasOne(fields: ["id"])
+  internApplicantInfo: InternApplicant @hasOne(fields: ["id"])
+  employeeInfo: Employee @hasOne(fields: ["id"])
+  jobApplicantInfo: JobApplicant @hasOne(fields: ["id"])
+  adminInfo: Admin @hasOne(fields: ["id"])
+  vendorInfo: Vendor @hasOne(fields: ["id"])
+  superAdminInfo: SuperAdmin @hasOne(fields: ["id"])
+  investorInfo: Investor @hasOne(fields: ["id"])
+  #kanban
+  projects: [Project] @manyToMany(relationName: "userProjects")
+  tasks: [Task] @manyToMany(relationName: "userAssignedTasks")
+}
 type Student @model
 @auth(rules: [{ allow: owner, operations: [create, delete, update] }])
 {
@@ -72,95 +76,94 @@ type Student @model
   degree: String
   college: String
   passingYear: Int
+  coursesEnrolled: [Course] @manyToMany(relationName: "enrolledInCourse")
+  chaptersCompleted: [Chapter] @manyToMany(relationName: "chapterCompletedBy")
+  examsEnrolled: [Exam] @manyToMany(relationName: "enrolledForExam")
+  examsAttemped: [Exam] @manyToMany(relationName: "examsAttemped")
 }
-type Guardian @model
-@auth(rules: [{ allow: owner, operations: [create, delete, update] }])
-{
+
+type Guardian
+  @model
+  @auth(rules: [{ allow: owner, operations: [create, delete, update] }]) {
   userId: ID! @primaryKey
-  student : User @hasOne
+  student: User @hasOne
 }
-type Educator @model
-@auth(rules: [{ allow: owner, operations: [create, delete, update] }])
-{
+type Educator
+  @model
+  @auth(rules: [{ allow: owner, operations: [create, delete, update] }]) {
   userId: ID! @primaryKey
   subject: [String]
 }
-type EduCarer @model
-@auth(rules: [{ allow: owner, operations: [create, delete, update] }])
-{
+type EduCarer
+  @model
+  @auth(rules: [{ allow: owner, operations: [create, delete, update] }]) {
   userId: ID! @primaryKey
 }
-type PersonalProject 
-{
-  name: String
-  description: String
-  links : [String]
-}
-type Experience
-{
-  companyName: String
-  position: String
-  jobDescription: String
-  joiningDate: AWSDate
-  leavingDate: AWSDate
-}
-type Intern @model
-@auth(rules: [{ allow: owner, operations: [create, delete, update] }])
-{
+type Intern
+  @model
+  @auth(rules: [{ allow: owner, operations: [create, delete, update] }]) {
   userId: ID! @primaryKey
   degree: String
   college: String
   passingYear: Int
-  projects: [PersonalProject]
-  experience: [Experience]
+  projects: [User_PersonalProject]
+  experience: [User_Experience]
 }
-type InternApplicant @model
-@auth(rules: [{ allow: owner, operations: [create, delete, update] }])
-{
+type InternApplicant
+  @model
+  @auth(rules: [{ allow: owner, operations: [create, delete, update] }]) {
   userId: ID! @primaryKey
   degree: String
   college: String
   passingYear: Int
   skills: [String]
   achievements: [String]
-  projects: [PersonalProject]
+  projects: [User_PersonalProject]
 }
-type Employee @model
+type Employee
+  @model
+  @auth(rules: [{ allow: owner, operations: [create, delete, update] }]) {
+  userId: ID! @primaryKey
+  experience: [User_Experience]
+}
+type JobApplicant
+  @model
+  @auth(rules: [{ allow: owner, operations: [create, delete, update] }]) {
+  projects: [User_PersonalProject]
+  experience: [User_Experience]
+}
+type Telecaller
+  @model
+  @auth(rules: [{ allow: owner, operations: [create, delete, update] }]) {
+  userId: ID! @primaryKey
+}
+type Admin
+  @model
+  @auth(rules: [{ allow: owner, operations: [create, delete, update] }]) {
+  userId: ID! @primaryKey
+}
+type Vendor
+  @model
+  @auth(rules: [{ allow: owner, operations: [create, delete, update] }]) {
+  userId: ID! @primaryKey
+}
+type SuperAdmin
+  @model
+  @auth(rules: [{ allow: owner, operations: [create, delete, update] }]) {
+  userId: ID! @primaryKey
+}
+type Investor
+  @model
+  @auth(rules: [{ allow: owner, operations: [create, delete, update] }]) {
+  userId: ID! @primaryKey
+}
+type LMSCourseInstructor @model
 @auth(rules: [{ allow: owner, operations: [create, delete, update] }])
 {
   userId: ID! @primaryKey
-  experience: [Experience]
-}
-type JobApplicant @model
-@auth(rules: [{ allow: owner, operations: [create, delete, update] }])
-{
-  projects: [PersonalProject]
-  experience: [Experience]
-}
-
-type Telecaller @model
-@auth(rules: [{ allow: owner, operations: [create, delete, update] }])
-{
-  userId: ID! @primaryKey
-}
-
-type Admin @model
-@auth(rules: [{ allow: owner, operations: [create, delete, update] }])
-{
-  userId: ID! @primaryKey
-}
-type Vendor @model
-@auth(rules: [{ allow: owner, operations: [create, delete, update] }])
-{
-  userId: ID! @primaryKey
-}
-type SuperAdmin @model
-@auth(rules: [{ allow: owner, operations: [create, delete, update] }])
-{
-  userId: ID! @primaryKey
-}
-type Investor @model
-@auth(rules: [{ allow: owner, operations: [create, delete, update] }])
-{
-  userId: ID! @primaryKey
+  description: String!
+  education: [Education]
+  title: String!
+  courses: [Course] @hasMany(indexName: "coursesByUser")
+  experience: [User_Experience]
 }
