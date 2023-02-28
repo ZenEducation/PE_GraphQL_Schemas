@@ -1,0 +1,112 @@
+
+# kanban schema
+enum StatusType {
+  InProgress
+  Pending
+  InReview
+  Success
+}
+enum Priority {
+  Highest
+  High
+  Low
+  Lowest
+}
+enum ActivityType {
+  Alert
+  Event
+}
+enum TaskType {
+  Create
+  Update
+  Performance
+  Design
+  Support
+  Backup
+}
+
+type Checklist {
+  name: String!
+  val: Boolean!
+}
+
+#Activity type
+type Alert {
+  icon: String
+  title: String
+  description: String
+}
+type Event {
+  icon: String
+  title: String
+  date: AWSDate
+  startTime: AWSDateTime!
+  endTime: AWSDateTime!
+}
+#models
+type Project 
+@auth(rules: [
+{ allow: owner }, # Defaults to use the "owner" field
+{ allow: owner, ownerField: "users", operations: [update, read, delete] }])
+@model
+{
+  id:ID!
+  name: String!
+  description: String!
+  users: [User] @manyToMany(relationName: "userProjects")
+  tasks: [Task] @hasMany(indexName: "taskByProject", fields: ["id"])
+  Activity: [Activity] @hasMany(indexName: "activityByProject", fields: ["id"])
+}
+type Task 
+@auth(rules: [
+{ allow: owner }, # Defaults to use the "owner" field
+{ allow: owner, ownerField: "assignees", operations: [update, read, delete] }])
+@model
+{
+  id: ID!
+  projectId: ID! @index(name: "taskByProject")
+  name: String!
+  description: String
+  icon: String
+  type: TaskType!
+  images: [String]
+  tags: [String]
+  assignees: [User] @manyToMany(relationName: "userAssignedTasks")
+  status: StatusType!
+  dueAt: AWSDate
+  totalSubtasks: Int
+  subtasksCompleted: Int
+  priority: Priority
+  checklist: [Checklist]
+  Creator: String
+  comments: [Comment] @hasMany(indexName: "byTask", fields: ["id"])
+}
+
+type Comment 
+@auth(rules: [
+{ allow: owner }, # Defaults to use the "owner" field
+{ allow: private, operations: [read] }])
+@model
+{
+  id: ID!
+  taskId: ID! @index(name: "byTask")
+  content: String!
+  images: [String]
+  userId: ID!
+  creator: User @hasOne(fields: ["userId"])
+}
+
+type Activity 
+@auth(rules: [
+{ allow: owner }, # Defaults to use the "owner" field
+{ allow: private, operations: [update, read] }])
+@model
+{
+  userId: ID!
+  creator: User @hasOne(fields: ["userId"])
+  projectId: ID! @index(name: "activityByProject")
+  type: ActivityType!
+  alert: Alert
+  event: Event
+  readBy: [User] @hasMany
+}
