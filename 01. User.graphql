@@ -17,6 +17,27 @@ enum UserType {
     Investor
 }
 
+# AuthInfo correcponds to the user info that we have stored in Cognito
+# Create a 1to1 relation with User model
+type AuthInfo @model { 
+id: ID!
+email: [String]
+createdAt: [String]
+phoneNum: [String]
+updatedAt: [String]
+
+}
+
+# Its the explicit store inside the database for the Permissions associated with an authenticated user
+type AuthUserPermission @model {
+allowCourseCreation: Boolean
+email: String
+allowEduCares: Boolean
+altPhoneNum: String
+}
+
+
+
 type User 
 @auth(rules: [{ allow: owner, operations: [create, delete, update] }]) 
 @model
