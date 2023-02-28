@@ -103,8 +103,13 @@ type Course
     thumbnailImageURL: String
     thumbnailVideoURL: String
     price: Int @default(value: "0")
-    enrolled: [Student] @manyToMany(relationName: "enrolledInCourse")
-    enrolledCount: Int
+    currentlyEnrolled: [Student] @manyToMany(relationName: "enrolledInCourse")
+    studentsWhoCompletedThisCourse: [Student] @manyToMany(relationName: " studentsWhoCompletedThisCourse")
+    exStudentsOfThisCourse: [Student] @manyToMany(relationName: " exStudentsOfThisCourse")
+    currentlyEnrolledStudentsCount: Int
+    allStudentsCount: Int
+    courseReviewsRatings: Int
+    avgStars: Float
     tags: [CourseTags] @manyToMany(relationName: "CourseTags")
     duration: Duration!
     chapters: [Chapter] @hasMany(indexName: "chapterByCourse")
