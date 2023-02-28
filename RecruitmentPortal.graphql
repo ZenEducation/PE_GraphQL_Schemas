@@ -1,4 +1,4 @@
-enum Departments {
+enum ListOfDepartments {
 
 Branding
 Sales
