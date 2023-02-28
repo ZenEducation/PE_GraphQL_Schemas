@@ -1,0 +1,136 @@
+enum CourseLevel {
+    Beginner
+    Intermediate
+    Advanced
+}
+type Duration {
+    hours: Int
+    min: Int
+}
+type Section {
+    title: String!
+    description: String!
+    duration: Duration
+    videoUrl: String!
+}
+type Chapter 
+@model {
+    id: ID!
+    courseId: ID! @index(name: "chapterByCourse", sortKeyFields: ["title"])
+    course: Course @belongsTo(fields: ["courseId"])
+    title: String!
+    description: String!
+    videoUrl: String #if course creator no sections in chapters
+    duration: Duration!
+    visibility: Boolean
+    previewLesson: Boolean #lesson will be available for preview without subscription
+    quiz: [MCQ] @hasMany(indexName: "MCQByQuiz")
+    section: [Section]
+    completedBy: [Student] @manyToMany(relationName: "chapterCompletedBy")
+}
+type MCQ @model{
+    id: ID!
+    examsID: ID @index(name: "MCQByExam")
+    quizId: ID @index(name: "MCQByQuiz")
+    question: String
+    imageUrl: String
+    points: Int
+    options: [Option]! @hasMany(indexName: "optionsByMCQ")
+}
+type Option @model{#this fits for both multi-correct and single-correct quiz
+    id: ID!
+    MCQid: ID! @index(name: "optionsByMCQ")
+    key: Int#to saperately identify the different options.
+    content: String!
+    val: Boolean!
+}
+type Student @model
+@auth(rules: [{ allow: owner, operations: [create, delete, update] }])
+{
+  userId: ID! @primaryKey
+  degree: String
+  college: String
+  passingYear: Int
+  coursesEnrolled: [Course] @manyToMany(relationName: "enrolledInCourse")
+  chaptersCompleted: [Chapter] @manyToMany(relationName: "chapterCompletedBy")
+  examsEnrolled: [Exam] @manyToMany(relationName: "enrolledForExam")
+  examsAttemped: [Exam] @manyToMany(relationName: "examsAttemped")
+}
+
+type MCQResponses @model {
+  id: ID!
+  userId : ID! @index(name: "useChapterResponses", sortKeyFields: ["chapterId"]) @index(name: "userExamResponses", sortKeyFields: ["examId"])
+  chapterId: ID 
+  examId: ID 
+  MCQId: ID!
+  MCQ: MCQ @hasOne
+  response: [Int]#will only contain keys options where student marked true
+}
+
+type ExamQuizResponses @model {
+  userId: ID!
+  chapterId: ID
+  examId: ID
+  chapter: [MCQResponses] @hasMany(indexName: "userChapterResponses", fields: ["userId", "chapterId"])
+  chapters: [MCQResponses] @hasMany(indexName: "userChapterResponses", fields: ["userId"])
+  exam: [MCQResponses] @hasMany(indexName: "userExamResponses", fields: ["userId", "examId"])
+  exams: [MCQResponses] @hasMany(indexName: "userExamResponses", fields: ["userId"])
+  totalScore: Int
+}
+type Course
+@model @searchable
+{
+    id: ID!
+    name: String!
+    description: String!
+    shortDescription: String!
+    thumbnailImageURL: String
+    thumbnailVideoURL: String
+    price: Int @default(value: "0")
+    enrolled: [Student] @manyToMany(relationName: "enrolledInCourse")
+    enrolledCount: Int
+    tags: [CourseTags] @manyToMany(relationName: "CourseTags")
+    duration: Duration!
+    chapters: [Chapter] @hasMany(indexName: "chapterByCourse")
+    language: String
+    deadline: AWSDate!
+    courseLevel: CourseLevel
+    UserId: ID! @index(name: "coursesByUser")#courses created by user
+}
+type Exam @model
+{
+  id: ID!
+  name: String!
+  description: String
+  startDate: AWSDate
+  dueDate: AWSDate
+  enrolled: [Student] @manyToMany(relationName: "enrolledForExam")
+  attempted: [Student] @manyToMany(relationName: "examsAttemped")
+  questions: Int
+  passingMarks: Int
+  MCQs: [MCQ] @hasMany(indexName: "MCQByExam")
+}
+type LMSCourseInstructor @model
+@auth(rules: [{ allow: owner, operations: [create, delete, update] }])
+{
+  userId: ID! @primaryKey
+  description: String!
+  education: [Education]
+  title: String!
+  courses: [Course] @hasMany(indexName: "coursesByUser")
+  experience: [Experience]
+}
+type CourseTags
+@model @searchable{
+    id: ID!
+    label: String!
+    courses: [Course] @manyToMany(relationName: "CourseTags")
+}
+type Review
+@model
+{
+    rating: Int!
+    content: String
+    user: User @hasOne
+    courseId: ID! @index
+}
