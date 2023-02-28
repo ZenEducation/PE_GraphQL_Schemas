@@ -1,4 +1,12 @@
-type Lead
+
+enum Lead_Status {
+  NEW
+  FOLLOW_UP
+  CONTACTED
+  CLOSED
+}
+
+type CRM_Lead
   @model
   @auth(rules: [
     { allow: owner, ownerField: "userId", operations: [create, update, delete] }
@@ -22,17 +30,27 @@ type Lead
   jobTitle: String
   history: String
 
-
 }
 
-enum LeadStatus {
-  NEW
-  FOLLOW_UP
-  CONTACTED
-  CLOSED
+type CRM_Customer
+  @model
+  @auth(rules: [
+    { allow: owner, ownerField: "userId", operations: [create, read, update, delete] }
+    { allow: groups, groups: ["Admins"], operations: [create, read, update, delete] }
+    { allow: public, operations: [read] }
+    { allow: private, operations: [read] }
+  ]) {
+  id: ID!
+  name: String!
+  email: String!
+  phone: String
+  leads: [Lead] @hasMany(name: "CustomerLeads")
+  campaigns: [Campaign] @hasMany(name: "CustomerCampaigns")
+  userId: String!
 }
 
-type Campaign
+
+type CRM_Campaign
   @model
   @auth(rules: [
     { allow: owner, ownerField: "userId", operations: [create, update, delete] }
@@ -52,19 +70,3 @@ type Campaign
   userId: String!
 }
 
-type Customer
-  @model
-  @auth(rules: [
-    { allow: owner, ownerField: "userId", operations: [create, read, update, delete] }
-    { allow: groups, groups: ["Admins"], operations: [create, read, update, delete] }
-    { allow: public, operations: [read] }
-    { allow: private, operations: [read] }
-  ]) {
-  id: ID!
-  name: String!
-  email: String!
-  phone: String
-  leads: [Lead] @hasMany(name: "CustomerLeads")
-  campaigns: [Campaign] @hasMany(name: "CustomerCampaigns")
-  userId: String!
-}
