@@ -1,3 +1,13 @@
+enum examQuestionType {
+
+singleAnswerMCQ
+multipleAnswerMCQ
+TrueOrFalse
+IntegerType
+NumericalFloatingPointType
+
+}
+
 type MCQ @model{
     id: ID!
     examsID: ID @index(name: "MCQByExam")
