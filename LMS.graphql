@@ -1,19 +1,35 @@
-enum CourseLevel {
+type knowledgeDomain @model {
+Physics
+Chemistry
+Mathematics
+Biology
+WebDevelopment 
+-HTML #Make these an arry of objects
+-CSS 
+-JavaScript 
+--Vue #Make these an arry of objects
+--Nuxt
+--React
+--Next
+}
+
+
+enum LMS_CourseLevel {
     Beginner
     Intermediate
     Advanced
 }
-type Duration {
+type LMS_Course_Duration {
     hours: Int
     min: Int
 }
-type Section {
+type LMS_Course_Section @model {
     title: String!
     description: String!
     duration: Duration
     videoUrl: String!
 }
-type Chapter 
+type LMS_Course_Chapter 
 @model {
     id: ID!
     courseId: ID! @index(name: "chapterByCourse", sortKeyFields: ["title"])
