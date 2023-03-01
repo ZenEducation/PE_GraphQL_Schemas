@@ -76,10 +76,12 @@ type Student @model
   degree: String
   college: String
   passingYear: Int
-  coursesEnrolled: [Course] @manyToMany(relationName: "enrolledInCourse")
-  chaptersCompleted: [Chapter] @manyToMany(relationName: "chapterCompletedBy")
+  coursesEnrolled: [LMS_Course] @manyToMany(relationName: "enrolledInCourse")
+  chaptersCompleted: [LMS_Course_Chapter] @manyToMany(relationName: "chapterCompletedBy")
   examsEnrolled: [Exam] @manyToMany(relationName: "enrolledForExam")
   examsAttemped: [Exam] @manyToMany(relationName: "examsAttemped")
+  coursesCompleted: [LMS_Course] @manyToMany(relationName: "studentsWhoCompletedThisCourse")
+  beenExStudentOfCourse: [LMS_Course] @manyToMany(relationName: "exStudentsOfThisCourse")
 }
 
 type Guardian
@@ -164,6 +166,6 @@ type LMSCourseInstructor @model
   description: String!
   education: [Education]
   title: String!
-  courses: [Course] @hasMany(indexName: "coursesByUser")
+  courses: [LMS_Course] @manyToMany(relationName: "coursesByCreators")
   experience: [User_Experience]
 }
