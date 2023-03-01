@@ -1,22 +1,20 @@
-
-# kanban schema
-enum StatusType {
+enum Kanban_StatusType {
   InProgress
   Pending
   InReview
   Success
 }
-enum Priority {
+enum Kanban_Priority {
   Highest
   High
   Low
   Lowest
 }
-enum ActivityType {
+enum Kanban_ActivityType {
   Alert
   Event
 }
-enum TaskType {
+enum Kanban_TaskType {
   Create
   Update
   Performance
@@ -25,18 +23,18 @@ enum TaskType {
   Backup
 }
 
-type Checklist {
+type Kanban_Task_Checklist {
   name: String!
   val: Boolean!
 }
 
 #Activity type
-type Alert {
+type Kanban_Activity_Alert {
   icon: String
   title: String
   description: String
 }
-type Event {
+type Kanban_Activity_Event {
   icon: String
   title: String
   date: AWSDate
@@ -44,7 +42,7 @@ type Event {
   endTime: AWSDateTime!
 }
 #models
-type Project 
+type Kanban_Project 
 @auth(rules: [
 { allow: owner }, # Defaults to use the "owner" field
 { allow: owner, ownerField: "users", operations: [update, read, delete] }])
@@ -54,10 +52,10 @@ type Project
   name: String!
   description: String!
   users: [User] @manyToMany(relationName: "userProjects")
-  tasks: [Task] @hasMany(indexName: "taskByProject", fields: ["id"])
-  Activity: [Activity] @hasMany(indexName: "activityByProject", fields: ["id"])
+  tasks: [Kanban_Task] @hasMany(indexName: "taskByProject", fields: ["id"])
+  Activity: [Kanban_Activity] @hasMany(indexName: "activityByProject", fields: ["id"])
 }
-type Task 
+type Kanban_Task 
 @auth(rules: [
 { allow: owner }, # Defaults to use the "owner" field
 { allow: owner, ownerField: "assignees", operations: [update, read, delete] }])
@@ -68,21 +66,21 @@ type Task
   name: String!
   description: String
   icon: String
-  type: TaskType!
+  type: Kanban_TaskType!
   images: [String]
   tags: [String]
   assignees: [User] @manyToMany(relationName: "userAssignedTasks")
-  status: StatusType!
+  status: Kanban_StatusType!
   dueAt: AWSDate
   totalSubtasks: Int
   subtasksCompleted: Int
   priority: Priority
-  checklist: [Checklist]
+  checklist: [Kanban_Task_Checklist]
   Creator: String
-  comments: [Comment] @hasMany(indexName: "byTask", fields: ["id"])
+  comments: [Kanban_Task_Comment] @hasMany(indexName: "byTask", fields: ["id"])
 }
 
-type Comment 
+type Kanban_Task_Comment 
 @auth(rules: [
 { allow: owner }, # Defaults to use the "owner" field
 { allow: private, operations: [read] }])
@@ -96,7 +94,7 @@ type Comment
   creator: User @hasOne(fields: ["userId"])
 }
 
-type Activity 
+type Kanban_Activity 
 @auth(rules: [
 { allow: owner }, # Defaults to use the "owner" field
 { allow: private, operations: [update, read] }])
@@ -105,7 +103,7 @@ type Activity
   userId: ID!
   creator: User @hasOne(fields: ["userId"])
   projectId: ID! @index(name: "activityByProject")
-  type: ActivityType!
+  type: Kanban_ActivityType!
   alert: Alert
   event: Event
   readBy: [User] @hasMany
