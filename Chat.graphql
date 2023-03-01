@@ -1,0 +1,57 @@
+
+
+enum ChatType {
+    Personal
+    Group
+    Channel
+}
+type Chat
+@auth(rules: [
+{ allow: owner}
+{ allow: owner, ownerField: "users", operations: [update, read] }
+])
+@model{
+   name: String!
+   id: ID!
+   users: [User] @hasMany
+   type: ChatType! @auth(rules: [{ allow: owner, operations: [create, read] }, {allow: owner, ownerField: "users", operations: [read]}])
+   latestMessage: Message @hasOne
+   messages: [Message] @hasMany(indexName: "byChat", fields: ["id"])
+   channelInfo: Channel @hasOne (fields: ["id"])
+   groupInfo: Group @hasOne (fields: ["id"])
+}
+
+type Channel @model
+@auth(rules: [
+{ allow: owner }, # Defaults to use the "owner" field
+{ allow: owner, ownerField: "moderator", operations: [update, read] }])  # Authorize the update mutation and both queries])
+{
+    chatId: ID! @primaryKey
+    bio: String
+    image: String
+    backgroundImage: String
+    moderators:[User] @hasMany
+}
+
+type Group @model
+@auth(rules: [
+{ allow: owner }, # Defaults to use the "owner" field
+{ allow: owner, ownerField: "admin", operations: [update, read, delete] }])  # Authorize the update mutation and both queries])
+{
+    chatId: ID! @primaryKey
+    bio: String
+    image: String
+    backgroundImage: String
+    admins:[User] @hasMany
+}
+  
+  
+type Message @model
+@auth(rules: [{ allow: owner, operations: [read, create, delete, update] }, { allow: private, operations: [read]}]) #only the person who created will be able to update and delete the message
+{
+    id: ID!
+    sender: User @hasOne
+    content: String!
+    chatId: ID! @index(name: "byChat", queryField: "messagesByChat")
+    readBy: [User] @hasMany
+}

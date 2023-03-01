@@ -1,0 +1,115 @@
+type knowledgeDomain @model {
+Physics
+Chemistry
+Mathematics
+Biology
+WebDevelopment 
+-HTML #Make these an arry of objects
+-CSS 
+-JavaScript 
+--Vue #Make these an arry of objects
+--Nuxt
+--React
+--Next
+}
+
+
+enum LMS_CourseLevel {
+    Beginner
+    Intermediate
+    Advanced
+}
+type LMS_Course_Duration {
+    hours: Int
+    min: Int
+}
+type LMS_Course_Section @model {
+    title: String!
+    description: String!
+    duration: Duration
+    videoUrl: String!
+}
+type LMS_Course_Chapter 
+@model {
+    id: ID!
+    courseId: ID! @index(name: "chapterByCourse", sortKeyFields: ["title"])
+    course: Course @belongsTo(fields: ["courseId"])
+    title: String!
+    description: String!
+    videoUrl: String #if course creator no sections in chapters
+    duration: Duration!
+    visibility: Boolean
+    previewLesson: Boolean #lesson will be available for preview without subscription
+    quiz: [MCQ] @hasMany(indexName: "MCQByQuiz")
+    section: [Section]
+    completedBy: [Student] @manyToMany(relationName: "chapterCompletedBy")
+}
+
+
+
+type Student @model
+@auth(rules: [{ allow: owner, operations: [create, delete, update] }])
+{
+  userId: ID! @primaryKey
+  degree: String
+  college: String
+  passingYear: Int
+  coursesEnrolled: [Course] @manyToMany(relationName: "enrolledInCourse")
+  chaptersCompleted: [Chapter] @manyToMany(relationName: "chapterCompletedBy")
+  examsEnrolled: [Exam] @manyToMany(relationName: "enrolledForExam")
+  examsAttemped: [Exam] @manyToMany(relationName: "examsAttemped")
+}
+
+
+
+
+type Course
+@model @searchable
+{
+    id: ID!
+    name: String!
+    description: String!
+    shortDescription: String!
+    thumbnailImageURL: String
+    thumbnailVideoURL: String
+    price: Int @default(value: "0")
+    currentlyEnrolled: [Student] @manyToMany(relationName: "enrolledInCourse")
+    studentsWhoCompletedThisCourse: [Student] @manyToMany(relationName: " studentsWhoCompletedThisCourse")
+    exStudentsOfThisCourse: [Student] @manyToMany(relationName: " exStudentsOfThisCourse")
+    currentlyEnrolledStudentsCount: Int
+    allStudentsCount: Int
+    courseReviewsRatings: Int
+    avgStars: Float
+    tags: [CourseTags] @manyToMany(relationName: "CourseTags")
+    duration: Duration!
+    chapters: [Chapter] @hasMany(indexName: "chapterByCourse")
+    language: String
+    deadline: AWSDate!
+    courseLevel: CourseLevel
+    UserId: ID! @index(name: "coursesByUser")#courses created by user
+}
+
+type LMSCourseInstructor @model
+@auth(rules: [{ allow: owner, operations: [create, delete, update] }])
+{
+  userId: ID! @primaryKey
+  description: String!
+  education: [Education]
+  title: String!
+  courses: [Course] @hasMany(indexName: "coursesByUser")
+  experience: [Experience]
+}
+type CourseTags
+@model @searchable{
+    id: ID!
+    label: String!
+    courses: [Course] @manyToMany(relationName: "CourseTags")
+}
+type Review
+@model
+{
+    rating: Int!
+    content: String
+    user: User @hasOne
+    courseId: ID! @index
+}

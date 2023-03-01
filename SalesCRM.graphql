@@ -1,0 +1,72 @@
+
+enum Lead_Status {
+  NEW
+  FOLLOW_UP
+  CONTACTED
+  CLOSED
+}
+
+type CRM_Lead
+  @model
+  @auth(rules: [
+    { allow: owner, ownerField: "userId", operations: [create, update, delete] }
+    { allow: groups, groups: ["Admins"], operations: [create, update, delete] }
+    { allow: public, operations: [read] }
+    { allow: private, operations: [read] }
+  ]) {
+  id: ID!
+  firstName: String!
+  lastName: String!
+  email: String!
+  phone: String
+  status: LeadStatus
+  source: String
+  campaign: Campaign @belongsTo(fields: ["campaignId"])
+  customer: Customer @belongsTo(fields: ["customerId"])
+  userId: String!
+  doNotCall: Boolean
+  industry: String
+  owner: String
+  jobTitle: String
+  history: String
+
+}
+
+type CRM_Customer
+  @model
+  @auth(rules: [
+    { allow: owner, ownerField: "userId", operations: [create, read, update, delete] }
+    { allow: groups, groups: ["Admins"], operations: [create, read, update, delete] }
+    { allow: public, operations: [read] }
+    { allow: private, operations: [read] }
+  ]) {
+  id: ID!
+  name: String!
+  email: String!
+  phone: String
+  leads: [Lead] @hasMany(name: "CustomerLeads")
+  campaigns: [Campaign] @hasMany(name: "CustomerCampaigns")
+  userId: String!
+}
+
+
+type CRM_Campaign
+  @model
+  @auth(rules: [
+    { allow: owner, ownerField: "userId", operations: [create, update, delete] }
+    { allow: groups, groups: ["Admins"], operations: [create, update, delete] }
+    { allow: public, operations: [read] }
+    { allow: private, operations: [read] }
+  ]) {
+  id: ID!
+  name: String!
+  startDate: AWSDate!
+  endDate: AWSDate!
+  active: Boolean
+  ActualCost: String
+  description: String
+  leads: [Lead] @hasMany(name: "LeadCampaign")
+  campaigns: [Campaign] @hasMany(name: "CustomerCampaigns")
+  userId: String!
+}
+
