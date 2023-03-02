@@ -15,6 +15,7 @@ type Lead
   source: String
   campaign: Campaign @belongsTo(fields: ["campaignId"])
   customer: Customer @belongsTo(fields: ["customerId"])
+  contacts: [Contact] @hasMany(indexName: "byLead", fields: ["id"])
   userId: String!
   doNotCall: Boolean
   industry: String
@@ -49,6 +50,7 @@ type Campaign
   description: String
   leads: [Lead] @hasMany(name: "LeadCampaign")
   campaigns: [Campaign] @hasMany(name: "CustomerCampaigns")
+  contacts: [Contact] @hasMany(indexName: "byCustomer", fields: ["id"])
   userId: String!
 }
 
@@ -66,5 +68,26 @@ type Customer
   phone: String
   leads: [Lead] @hasMany(name: "CustomerLeads")
   campaigns: [Campaign] @hasMany(name: "CustomerCampaigns")
+  contacts: [Contact] @hasMany(indexName: "byCampaign", fields: ["id"])
+  userId: String!
+}
+
+type Contact
+  @model
+  @auth(rules: [
+    { allow: owner, ownerField: "userId", operations: [create, read, update, delete] }
+    { allow: groups, groups: ["Admins"], operations: [create, read, update, delete] }
+  ]) {
+  id: ID!
+  firstName: String!
+  lastName: String!
+  email: String!
+  phone: String
+  lead: Lead @belongsTo(fields: ["leadId"])
+  leadId: ID
+  customer: Customer @belongsTo(fields: ["customerId"])
+  customerId: ID
+  campaign: Campaign @belongsTo(fields: ["campaignId"])
+  campaignId: ID
   userId: String!
 }
