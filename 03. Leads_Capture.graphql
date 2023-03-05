@@ -1,5 +1,6 @@
 # Student signup flow
 
+
 # Step 1 Basic Req:  first we take requirement (never discard worst case attach to IP)
 # Step 2 Signup: allow signup with needed data like phone etc
 # Step 3 Verify: Verify account [{student}, {parent/guardian/relative}, {mediator/company/others/mislaneous}]
@@ -51,3 +52,17 @@
 # free time slots (multi select)
 #   time of the day
 #   time of the week
+
+
+type Lead @model @auth(rules: [{ allow: owner }]) {
+  id: ID!
+  name: String!
+  email: String!
+  phone: String
+  company: String
+  notes: String
+  createdAt: AWSDateTime
+  updatedAt: AWSDateTime
+  owner: String
+}
+
