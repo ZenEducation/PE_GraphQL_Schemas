@@ -1,1 +1,13 @@
 
+
+type Lead @model @auth(rules: [{ allow: owner }]) {
+  id: ID!
+  name: String!
+  email: String!
+  phone: String
+  company: String
+  notes: String
+  createdAt: AWSDateTime
+  updatedAt: AWSDateTime
+  owner: String
+}

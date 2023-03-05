@@ -1,4 +1,3 @@
-
 enum Lead_Status {
   NEW
   FOLLOW_UP
@@ -25,11 +24,11 @@ type CRM_Lead
   customer: Customer @belongsTo(fields: ["customerId"])
   userId: String!
   doNotCall: Boolean
+  contacts: [Contact] @hasMany(indexName: "byLead", fields: ["id"])
   industry: String
   owner: String
   jobTitle: String
   history: String
-
 }
 
 type CRM_Customer
@@ -46,6 +45,7 @@ type CRM_Customer
   phone: String
   leads: [Lead] @hasMany(name: "CustomerLeads")
   campaigns: [Campaign] @hasMany(name: "CustomerCampaigns")
+  contacts: [Contact] @hasMany(indexName: "byCustomer", fields: ["id"])
   userId: String!
 }
 
@@ -67,6 +67,29 @@ type CRM_Campaign
   description: String
   leads: [Lead] @hasMany(name: "LeadCampaign")
   campaigns: [Campaign] @hasMany(name: "CustomerCampaigns")
+  contacts: [Contact] @hasMany(indexName: "byCampaign", fields: ["id"])
   userId: String!
 }
 
+
+type CRM_Contact
+  @model
+  @auth(rules: [
+    { allow: owner, ownerField: "userId", operations: [create, update, delete] }
+    { allow: groups, groups: ["Admins"], operations: [create, update, delete] }
+    { allow: public, operations: [read] }
+    { allow: private, operations: [read] }
+  ]) {
+  id: ID!
+  firstName: String!
+  lastName: String!
+  email: String!
+  phone: String
+  lead: Lead @belongsTo(fields: ["leadId"])
+  leadId: ID
+  customer: Customer @belongsTo(fields: ["customerId"])
+  customerId: ID
+  campaign: Campaign @belongsTo(fields: ["campaignId"])
+  campaignId: ID
+  userId: String!
+}
