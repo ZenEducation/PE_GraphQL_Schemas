@@ -1,3 +1,5 @@
+# The following proposed Schema follows this UI: https://lineone.piniastudio.com/apps-kanban.html#
+
 enum Kanban_StatusType {
   InProgress
   Pending
