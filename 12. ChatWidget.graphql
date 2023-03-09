@@ -1,1 +1,80 @@
+#time will be stored in seconds
+type Website_Visitor_Report
+  @model
+  @auth(
+    rules: [
+      { allow: private, operations: [read, update] } # Defaults to use the "owner" field
+    ]
+  ) {
+  visitors: [Website_Visitor]
+  totalVisitors: Int
+  totalVisitDuration: Int
+  TotalPageViews: Int
+}
 
+type Website_Visitor
+  @model
+  @auth(
+    rules: [
+      { allow: private, operations: [read, update] } # Defaults to use the "owner" field
+    ]
+  ) {
+  ip: String!
+  totalVisitDuration: Int
+  totalPagesViewed: Int
+}
+enum ChatWidget_Status {
+  Active
+  Finished
+  Missed
+}
+
+type ChatWidget_Chat @model {
+  visitor: Website_Visitor @hasOne
+  id: ID!
+  status: ChatWidget_Status!
+  latestMessage: Chat_Message @hasOne
+  messages: [ChatWidget_Message]
+    @hasMany(indexName: "messagesByChatWidget", fields: ["id"])
+}
+
+type ChatWidget_Message
+  @model
+  @auth(
+    rules: [
+      { allow: owner } # Defaults to use the "owner" field
+      { allow: private, operations: [update, read, delete] }
+    ]
+  ) {
+  visitorIp: Website_Visitor @hasOne #when sender is client it stores the client Ip
+  employeeId: Employee @hasOne #when sender is employee it stores the employeeId
+  content: String!
+  id: ID!
+  chatWidgetId: ID! @index(name: "messagesByChatWidget")
+}
+#following model is the info captured by the chatbot
+type ChatWidget_Info
+  @model
+  @auth(
+    rules: [
+      { allow: owner } # Defaults to use the "owner" field
+      { allow: private, operations: [update, read, delete] }
+    ]
+  ) {
+  name: String
+  email: String
+  mobileNo: String
+}
+
+type Chat_Widget_feedback
+  @model
+  @auth(
+    rules: [
+      { allow: owner } # Defaults to use the "owner" field
+      { allow: private, operations: [update, read, delete] }
+    ]
+  ) {
+  ip: String
+  content: String!
+  rating: Int!
+}
