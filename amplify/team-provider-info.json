@@ -1,0 +1,23 @@
+{
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-userschemagraphql-dev-10716-authRole",
+      "UnauthRoleArn": "arn:aws:iam::596109967064:role/amplify-userschemagraphql-dev-10716-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::596109967064:role/amplify-userschemagraphql-dev-10716-authRole",
+      "Region": "ap-southeast-2",
+      "DeploymentBucketName": "amplify-userschemagraphql-dev-10716-deployment",
+      "UnauthRoleName": "amplify-userschemagraphql-dev-10716-unauthRole",
+      "StackName": "amplify-userschemagraphql-dev-10716",
+      "StackId": "arn:aws:cloudformation:ap-southeast-2:596109967064:stack/amplify-userschemagraphql-dev-10716/004507c0-bf7b-11ed-9717-068acc145c0c",
+      "AmplifyAppId": "d3hcdali4m2qom"
+    },
+    "categories": {
+      "auth": {
+        "userschemagraphqlffc2a288": {}
+      },
+      "api": {
+        "userschemagraphql": {}
+      }
+    }
+  }
+}
