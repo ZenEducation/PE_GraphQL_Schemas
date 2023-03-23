@@ -2,19 +2,22 @@ type Article {
   id: ID!
   slug: String!
   title: String!
-  content: String!
-  status: ArticleStatus!
-  visibility: ArticleVisibility!
-  category: String!
-  language: String!
-  metaDescription: String!
-  imageUrl: String!
-  relatedArticles: [Article!]!
-  likes: Int!
-  dislikes: Int!
-  createdAt: AWSDate!
-  updatedAt: AWSDate!
+  content: String
+  status: ArticleStatus
+  visibility: ArticleVisibility
+  category: String
+  language: String
+  metaDescription: String
+  imageUrl: String
+  relatedArticles: [Article]
+  likes: Int
+  dislikes: Int
+  updatedAt: AWSDate
 }
+
+"""
+Article status is used for filtering
+"""
 
 enum ArticleStatus {
   ALL
@@ -26,40 +29,5 @@ enum ArticleStatus {
 enum ArticleVisibility {
   PUBLIC
   PRIVATE
-}
-
-type Query {
-  articles(status: ArticleStatus, visibility: ArticleVisibility, category: String, language: String): [Article!]!
-  article(slug: String!): Article
-}
-
-type Mutation {
-  createArticle(input: CreateArticleInput!): Article!
-  updateArticle(slug: String!, input: UpdateArticleInput!): Article!
-  deleteArticle(slug: String!): Boolean!
-}
-
-input CreateArticleInput {
-  slug: String!
-  title: String!
-  content: String!
-  status: ArticleStatus!
-  visibility: ArticleVisibility!
-  category: String!
-  language: String!
-  metaDescription: String!
-  imageUrl: String!
-  relatedArticles: [String!]
-}
-
-input UpdateArticleInput {
-  title: String
-  content: String
-  status: ArticleStatus
-  visibility: ArticleVisibility
-  category: String
-  language: String
-  metaDescription: String
-  imageUrl: String
-  relatedArticles: [String!]
+  INDRAFT
 }
