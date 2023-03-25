@@ -1,0 +1,33 @@
+type Article {
+  id: ID!
+  slug: String!
+  title: String!
+  content: String
+  status: ArticleStatus
+  visibility: ArticleVisibility
+  category: String
+  language: String
+  metaDescription: String
+  imageUrl: String
+  relatedArticles: [Article]
+  likes: Int
+  dislikes: Int
+  updatedAt: AWSDate
+}
+
+"""
+Article status is used for filtering
+"""
+
+enum ArticleStatus {
+  ALL
+  PUBLISHED
+  DRAFT
+  ARCHIVED
+}
+
+enum ArticleVisibility {
+  PUBLIC
+  PRIVATE
+  INDRAFT
+}
