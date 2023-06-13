@@ -1,0 +1,201 @@
+# This "input" configures a global authorization rule to enable public access to
+# all models in this schema. Learn more about authorization rules here: https://docs.amplify.aws/cli/graphql/authorization-rules
+input AMPLIFY {
+  globalAuthRule: AuthRule = { allow: public }
+} # FOR TESTING ONLY!
+type AuthInfo @model @auth(rules: [{ allow: public }]) {
+  id: ID!
+  firstName: String
+  middleName: String
+  lastName: String
+  email: AWSEmail!
+  phoneNum: AWSPhone
+  createdAt: AWSDateTime
+  updatedAt: [AWSDateTime]
+}
+
+type UserMale @model @auth(rules: [{ allow: public }]) {
+  id: ID!
+  firstName: String!
+  middleName: String
+  lastName: String!
+  email: AWSEmail!
+  alt_emails: [AWSEmail]
+  phoneNum: AWSPhone
+  alt_phoneNums: [AWSPhone]
+  createdAt: AWSDateTime
+  updatedAt: [AWSDateTime]
+  UserMale_TextEmployee: [TextEmployee]
+    @manyToMany(relationName: "UserMale_TextEmployee")
+  UserMale_DelightEmployee: [DelightEmployee]
+    @manyToMany(relationName: "UserMale_DelightEmployee")
+}
+
+type UserFemale @model @auth(rules: [{ allow: public }]) {
+  id: ID!
+  firstName: String!
+  middleName: String
+  lastName: String!
+  email: AWSEmail!
+  alt_emails: [AWSEmail]
+  phoneNum: AWSPhone
+  alt_phoneNums: [AWSPhone]
+  createdAt: AWSDateTime
+  updatedAt: [AWSDateTime]
+  UserFemale_TextEmployee: [TextEmployee]
+    @manyToMany(relationName: "UserFemale_TextEmployee")
+  UserFemale_DelightEmployee: [DelightEmployee]
+    @manyToMany(relationName: "UserFemale_DelightEmployee")
+}
+
+type UserMisc @model @auth(rules: [{ allow: public }]) {
+  id: ID!
+  firstName: String!
+  middleName: String
+  lastName: String!
+  email: AWSEmail!
+  alt_emails: [AWSEmail]
+  phoneNum: AWSPhone
+  alt_phoneNums: [AWSPhone]
+  createdAt: AWSDateTime
+  updatedAt: [AWSDateTime]
+  UserMisc_TextEmployee: [TextEmployee]
+    @manyToMany(relationName: "UserMisc_TextEmployee")
+  UserMisc_DelightEmployee: [DelightEmployee]
+    @manyToMany(relationName: "UserMisc_DelightEmployee")
+}
+
+type TextEmployee @model @auth(rules: [{ allow: public }]) {
+  id: ID!
+  firstName: String!
+  middleName: String
+  lastName: String!
+  email: AWSEmail!
+  alt_emails: [AWSEmail]
+  phoneNum: AWSPhone
+  alt_phoneNums: [AWSPhone]
+  createdAt: AWSDateTime
+  updatedAt: [AWSDateTime]
+  UserMale_TextEmployee: [UserMale]
+    @manyToMany(relationName: "UserMale_TextEmployee")
+  UserFemale_TextEmployee: [UserFemale]
+    @manyToMany(relationName: "UserFemale_TextEmployee")
+  UserMisc_TextEmployee: [UserMisc]
+    @manyToMany(relationName: "UserMisc_TextEmployee")
+}
+
+type DelightEmployee @model @auth(rules: [{ allow: public }]) {
+  id: ID!
+  firstName: String!
+  middleName: String
+  lastName: String!
+  email: AWSEmail!
+  alt_emails: [AWSEmail]
+  phoneNum: AWSPhone
+  alt_phoneNums: [AWSPhone]
+  createdAt: AWSDateTime
+  updatedAt: [AWSDateTime]
+  UserMale_DelightEmployee: [UserMale]
+    @manyToMany(relationName: "UserMale_DelightEmployee")
+  UserFemale_DelightEmployee: [UserFemale]
+    @manyToMany(relationName: "UserFemale_DelightEmployee")
+  UserMisc_DelightEmployee: [UserMisc]
+    @manyToMany(relationName: "UserMisc_DelightEmployee")
+}
+
+type InternApplicant @model @auth(rules: [{ allow: public }]) {
+  id: ID!
+  firstName: String!
+  middleName: String
+  lastName: String!
+  email: AWSEmail!
+  alt_emails: [AWSEmail]
+  phoneNum: AWSPhone
+  alt_phoneNums: [AWSPhone]
+  createdAt: AWSDateTime
+  updatedAt: [AWSDateTime]
+}
+
+type JobApplicant @model @auth(rules: [{ allow: public }]) {
+  id: ID!
+  firstName: String!
+  middleName: String
+  lastName: String!
+  email: AWSEmail!
+  alt_emails: [AWSEmail]
+  phoneNum: AWSPhone
+  alt_phoneNums: [AWSPhone]
+  createdAt: AWSDateTime
+  updatedAt: [AWSDateTime]
+}
+
+type Intern @model @auth(rules: [{ allow: public }]) {
+  id: ID!
+  firstName: String!
+  middleName: String
+  lastName: String!
+  email: AWSEmail!
+  alt_emails: [AWSEmail]
+  phoneNum: AWSPhone
+  alt_phoneNums: [AWSPhone]
+  createdAt: AWSDateTime
+  updatedAt: [AWSDateTime]
+}
+
+type Employee @model @auth(rules: [{ allow: public }]) {
+  id: ID!
+  firstName: String!
+  middleName: String
+  lastName: String!
+  email: AWSEmail!
+  alt_emails: [AWSEmail]
+  phoneNum: AWSPhone
+  alt_phoneNums: [AWSPhone]
+  createdAt: AWSDateTime
+  updatedAt: [AWSDateTime]
+}
+
+type Admin @model @auth(rules: [{ allow: public }]) {
+  id: ID!
+  firstName: String!
+  middleName: String
+  lastName: String!
+  email: AWSEmail!
+  alt_emails: [AWSEmail]
+  phoneNum: AWSPhone
+  alt_phoneNums: [AWSPhone]
+  createdAt: AWSDateTime
+  updatedAt: [AWSDateTime]
+}
+
+type SuperAdmin @model @auth(rules: [{ allow: public }]) {
+  id: ID!
+  firstName: String!
+  middleName: String
+  lastName: String!
+  email: AWSEmail!
+  alt_emails: [AWSEmail]
+  phoneNum: AWSPhone
+  alt_phoneNums: [AWSPhone]
+  createdAt: AWSDateTime
+  updatedAt: [AWSDateTime]
+}
+
+type Blog @model @auth(rules: [{ allow: public }]) {
+  id: ID!
+  name: String!
+  posts: [Post] @hasMany
+}
+
+type Post @model @auth(rules: [{ allow: public }]) {
+  id: ID!
+  title: String!
+  blog: Blog @belongsTo
+  comments: [Comment] @hasMany
+}
+
+type Comment @model @auth(rules: [{ allow: public }]) {
+  id: ID!
+  post: Post @belongsTo
+  content: String!
+}
