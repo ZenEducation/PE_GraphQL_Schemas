@@ -1,0 +1,829 @@
+# Test Series
+
+type TestSeries @model 
+@auth(
+    rules: [
+      { allow: owner } # Defaults to use the "owner" field
+      { allow: owner, ownerField: "enrolled", operations: [read] }
+    ]
+  )
+{
+    id: ID!
+    title: String!
+    courseImageUrl: String!
+    publishingDate: String!
+    publishingStatus: String!
+    price: Float!
+    courseName: String!
+    isFree: Boolean!
+    tags: [String!]!
+    filter: TestSeriesFilters
+}
+
+# filter by
+
+type TestSeriesFilters {
+    publishingDate: String
+    publishingStatus: String
+    isFree: Boolean
+}
+
+# basic setting
+
+type Setting {
+    testSeriesName: String!
+    testSeriesID: String!
+    shortDescription: String
+    description: String
+    testSeriesImageUrl: String!
+}
+
+# Pricing and Validity
+
+# pricing
+
+enum SellingType {
+    FREE
+    PAID
+}
+
+type TestSeriesSellingType {
+    id: ID! 
+    sellingType: SellingType!
+}
+
+type Pricing {
+    testSeriesPrice: Float!
+    testSeriesDiscountedPrice: Float!
+}
+
+# Validity
+
+# Scalar type to handle dates
+
+scalar Date
+
+type Validity {
+    setValidity: Int!
+    setExpiry: Date!
+    variablePricing: [VariablePricing!]!
+}
+
+type VariablePricing {
+    courseValidity: Int!
+    coursePrice: Float!
+    discountPrice: Float!
+}
+
+# Publish Test Series
+
+enum TestSeriesPublishStatus {
+    LIVE
+    UNPUBLISHED
+    SCHEDULED
+}
+
+type PublishTestSeries {
+    id: ID!
+    title: String!
+    publishStatus: TestSeriesPublishStatus!
+    scheduledReleaseDate: Date @include(if: { eq: SCHEDULED })
+}
+
+# User Management
+
+enum MembershipStatus {
+    ACTIVE
+    INACTIVE
+    # add if more
+}
+
+type FiltersTags {
+    joinedOn: Date
+    lastLogin: Date
+    membershipStatus: MembershipStatus
+}
+
+type UserManagement @model 
+@auth(
+    rules: [
+      { allow: owner } # Defaults to use the "owner" field
+      { allow: private, operations: [update, read] }
+    ]
+  )
+{
+    id: ID!
+    name: String!
+    email: String!
+    mobileNumber: Int!
+    lastLogin: Date!
+    joinedOn: Date!
+    enabled: Boolean @default(value: "false")
+    filterTags: [FiltersTags]
+}
+
+# Add Products
+
+enum CoursePublishStatus {
+    PUBLISHED
+    UNPUBLISHED
+    COMING_SOON
+    # add if more
+}
+
+enum TestType {
+    MOCK_TEST
+    VIDEO_LECTURE
+    PDF_FILE
+}
+
+type FiltersTags {
+    coursePublishStatus: CoursePublishStatus 
+    type: TestType
+    free: Boolean @default(value: "false")
+}
+
+type AddProducts @model 
+@auth(
+    rules: [
+      { allow: owner } # Defaults to use the "owner" field
+      { allow: private, operations: [update, read] }
+    ]
+  ) 
+{
+    id: ID!
+    mockTestID: ID!
+    title: String!
+    price: Float!
+    status: CoursePublishStatus!
+    type: TestType!
+    itemCount: Int!
+    filter: [FiltersTags]
+}
+
+# Manage Order
+
+type ManageOrder @model 
+@auth(
+    rules: [
+      { allow: owner } # Defaults to use the "owner" field
+      { allow: private, operations: [update, read] }
+    ]
+  )
+{
+    id: ID!
+    priority: Int!
+    courseImageUrl: String!
+    title: String!
+    price: Float!
+    type: TestType!
+}
+
+# Quiz maker
+
+type Set  @model 
+@auth(
+    rules: [
+      { allow: owner } # Defaults to use the "owner" field
+      { allow: private, operations: [update, read] }
+    ]
+  )
+{
+    id: ID!
+    name: String!
+    test: [test!]!
+    numberOfSets: Int!
+    numberOfTests: Int!
+    numberOfQuestions: Int!
+    publishStatus: CoursePublishStatus!
+}
+
+# Test
+
+enum TestTag {
+    MCQ
+    QUESTIONS_AND_ANSWERS
+    #Add or remove if needed
+}
+
+enum TypeOfTest {
+    TRAIL
+    PAID
+}
+
+enum DisplayType {
+    HIDE
+    SHOW
+}
+
+enum ContentDripping {
+    ENABLE
+    DISABLE
+}
+
+enum EnrollmentType {
+    STUDENT_ENROLLMENT_DATE
+    FIXED_START_DATE
+}
+
+type Test @model 
+@auth(
+    rules: [
+      { allow: owner } # Defaults to use the "owner" field
+      { allow: private, operations: [update, read] }
+    ]
+  )
+{
+    id: ID!
+    title: String!
+    testTag: TestTag!
+    TestType: TypeOfTest!
+    shortDescription: String
+    longDescription: String
+    numberOfQuestions: Int!
+    duration: Int!
+    totalMarks: Int!
+    status: TestSeriesPublishStatus!
+    expiryDate: Date!
+    lessonThumnailUrl: String!
+    lessonUrl: String!
+    attachmentUrl: String!
+    displayType: DisplayType!
+    contentDripping: ContentDripping!
+    enrollmentType: EnrollmentType!
+}
+
+# Mock Test
+
+type MockTest @model 
+@auth(
+    rules: [
+      { allow: owner } # Defaults to use the "owner" field
+      { allow: private, operations: [update, read] }
+    ]
+  )
+{
+    id: ID!
+    title: String!
+    mockTestID: ID
+    name: String!
+    filter: TestSeriesFilters
+    numberOfCourse: Int!
+    courseName: String!
+    status: CoursePublishStatus!
+    numberOfDays: Int! #number of days gone by after course was uploaded
+}
+
+# Instructions
+
+type Instructions @model 
+@auth(
+    rules: [
+      { allow: owner } # Defaults to use the "owner" field
+      { allow: private, operations: [update, read] }
+    ]
+  ) 
+{
+    id: ID!
+    title: String!
+    shortDescription: String!
+    lessonThumnailUrl: String!
+    lessonUrl: String!
+    attachmentUrls: [String!]!
+}
+
+# MCQ
+
+enum DifficultyLevel {
+    EASY
+    MEDIUM
+    HARD
+}
+
+enum McqTag {
+    MULTIPLE_ANSWER
+    PARTIAL_MARKING
+}
+
+type McqOption @model 
+@auth(
+    rules: [
+      { allow: owner } # Defaults to use the "owner" field
+      { allow: private, operations: [read] }
+    ]
+  )
+{
+    id: ID!
+    Choise_letter: String! #a or b or c or so on
+    title: String!
+    isCorrect: Boolean @default(value: "false")
+    explanation: String!
+}
+
+type Mcq_Question @model 
+@auth(
+    rules: [
+      { allow: owner } # Defaults to use the "owner" field
+      { allow: private, operations: [update, read] }
+    ]
+  )
+{
+    id: ID!
+    title: String!
+    option: [McqOption!]!
+    difficultyLevel: DifficultyLevel!
+    tag: McqTag!
+    guidelineTime: Int!
+    marksIfCorrect: Int!
+    marksIfWrong: Int!
+}
+
+# Numerical Question
+
+type NumericalQuestion @model 
+@auth(
+    rules: [
+      { allow: owner } # Defaults to use the "owner" field
+      { allow: private, operations: [update, read] }
+    ]
+  )
+{
+    id: ID!
+    title: String!
+    answer: String!
+    explanation: String!
+    difficultyLevel: DifficultyLevel!
+    tag: McqTag!
+    guidelineTime: Int!
+    marksIfCorrect: Int!
+    marksIfWrong: Int!
+}
+
+# Essay Question
+
+type EssayQuestion @model 
+@auth(
+    rules: [
+      { allow: owner } # Defaults to use the "owner" field
+      { allow: private, operations: [update, read] }
+    ]
+  )
+{
+    id: ID!
+    title: String!
+    criteriaTitle: String!
+    percentageForCriteria: Int!
+    explanation: String!
+    difficultyLevel: DifficultyLevel!
+    marks: Float!
+    tag: String!
+}
+
+# Fill In the Blanks Question
+
+type BlankQuestion @model 
+@auth(
+    rules: [
+      { allow: owner } # Defaults to use the "owner" field
+      { allow: private, operations: [update, read] }
+    ]
+  )
+{
+    id: ID!
+    title: String!
+    answer: String!
+    explanation: String!
+    difficultyLevel: DifficultyLevel!
+    marksIfCorrect: Int!
+    marksIfWrong: Int!
+    tag: String!
+    guidelineTime: Int!
+}
+
+type TypeOfQuestion {
+    id: ID!
+    mcq_Question: [Mcq_Question]
+    numericalQuestion: [NumericalQuestion]
+    essayQuestion: [EssayQuestion]
+    blankQuestion: [BlankQuestion]
+}
+
+# group Question
+
+enum Section {
+    PHYSICS
+    CHEMISTRY
+    MATHEMATICS
+    # Add if any
+}
+
+type GroupQuestion @auth(rules: [{ allow: owner, operations: [create, delete, update] }])
+  @model
+{
+    id: ID!
+    name: String!
+    instructions: String!
+    difficultyLevel: DifficultyLevel!
+    selectSection: Section!
+    addQuestions: TypeOfQuestion!
+    marksIfCorrect: Int!
+    marksIfWrong: Int!
+}
+
+# learner UI
+
+# Section Analysis
+
+type SectionAnalysis @model 
+@auth(
+    rules: [
+      { allow: owner } # Defaults to use the "owner" field
+      { allow: owner, ownerField: "enrolled", operations: [read] }
+    ]
+  )
+{
+    id: ID!
+    sectionName: Section!
+    marks: Int!
+    percentile: Float!
+    accuracy: Float!
+    percentage: Float!
+}
+
+# Question Report
+
+type QuestionReport @model 
+@auth(
+    rules: [
+      { allow: owner } # Defaults to use the "owner" field
+      { allow: owner, ownerField: "enrolled", operations: [read] }
+    ]
+  )
+{
+    id: ID!
+    numberOfQuestions: Int!
+    numberOfCorrect: Int!
+    numberOfInCorrect: Int!
+    skipped: Int!
+    score: Int!
+    timeTaken: String!   
+}
+
+type DifficultyLevelAnalysis @model 
+@auth(
+    rules: [
+      { allow: owner } # Defaults to use the "owner" field
+      { allow: private, operations: [read] }
+    ]
+  )
+{
+    id: ID!
+    totalTimeSpend: String!
+    totalMarks: Int!
+    onEasyQuestions: Float!
+    onMediumQuestions: Float!
+    onIntenseQuestions: Float!
+}
+
+# Affiliate Management 
+
+type AffiliateManagement  @auth(rules: [{ allow: owner, operations: [create, delete, update] }])
+  @model
+{
+    id: ID!
+    name: String!
+    email: String!
+    commissionRate: Float!
+    mobileNumber: Int!
+    lastLogin: Date!
+    joinedOn: Date!
+    enabled: Boolean @default(value: "false")
+    filter: [FilterBy]
+}
+
+enum LeadStatus {
+    OPEN
+    CLOSE
+    #add if any
+}
+
+type FilterBy {
+    joinedOn: Date
+    lastLogin: Date
+    membershipStatus: MembershipStatus
+    products: String
+    leadStatus: LeadStatus
+    userSegment: String
+    lifeLong: String
+}
+
+# Affiliate Profile
+
+enum Role {
+    AFFILIATE
+    STUDENT
+    INSTRUCTOR
+    #add If any
+}
+
+enum Linking {
+    LIFELONG
+    COOKIE_BASED
+}
+
+
+enum SelectState{
+  Andhra Pradesh
+  Arunachal Pradesh
+  Assam
+  Bihar
+  Chhattisgarh
+  Goa
+  Gujarat
+  Haryana
+  Himachal Pradesh
+  Jharkhand
+  Karnataka
+  Kerala
+  Maharashtra
+  Madhya Pradesh
+  Manipur
+  Meghalaya
+  Mizoram
+  Nagaland
+  Odisha
+  Punjab
+  Rajasthan
+  Sikkim
+  Tamil Nadu
+  Tripura
+  Telangana
+  Uttar Pradesh
+  Uttarakhand
+  West Bengal
+  Andaman_and_Nicobar_UT
+  Chandigarh_UT
+  Dadra_and_Nagar_Haveli_and_Daman_and_Diu_UT
+  Delhi_National_Capital_Territory_NCT
+  Jammu_and_Kashmir_UT
+  Ladakh_UT
+  Lakshadweep_UT
+  Puducherry_UT
+}
+
+enum Language {
+    English
+    Hindi
+    # add if any
+
+}
+
+type AffiliateProfile @model 
+@auth(
+    rules: [
+      { allow: owner } # Defaults to use the "owner" field
+      { allow: private, operations: [update, read] }
+    ]
+  )
+{
+    id: ID!
+    name: String!
+    email: String!
+    mobile: Int!
+    role: Role!
+    commissionRate: Float!
+    allowCommision: Boolean! @default(value: "false")
+    linking: Linking!
+    numberOfDays: Int
+    state: SelectState! 
+    language: Language!
+}
+
+# Additional Details
+
+type AdditionalDetails {
+    id: ID!
+    userSegment: SellingType!
+    leadStatus: LeadStatus!
+    userNotes: String
+}
+
+# Referral details
+
+type Referral {
+    id: ID!
+    source: String!
+    referCode: String!
+    referCodeWhileSignuo: String!
+    TotalRefferedAffliates: Int!
+}
+
+# UTM Details
+
+type UtmDetails {
+    id: ID!
+    utmSource: String!
+    utmMedium: String!
+    utmCampaign: String!
+    utmTerm: String!
+    utmContent: String!
+}
+
+# Login Details
+
+enum LoginStatus {
+    SUCCESS
+    FAILURE
+    PENDING
+    # Add if any
+}
+
+type LoginDetails {
+    id: ID!
+    numberOfLogin: Int!
+    loginDeviceResetCount: Int!
+    lastLoginDate: String!
+    loginDate: Date!
+    ip: Float!
+    status: LoginStatus!
+    times: Int! 
+}
+
+# Enrolled Courses
+
+type EnrolledCourses @model
+@auth(rules: [{ allow: owner, operations: [create, delete, update] }])
+{
+    id: ID!
+    courseID: String!
+    courseTitle: String!
+    joinedOn: Date!
+    expiryDate: Date!
+    enabled: Boolean! @default(value: "false")
+    filterTags: [FiltersTags]
+}
+
+# Purchase History
+
+type PurchaseHistory @model 
+@auth(
+    rules: [
+      { allow: owner } # Defaults to use the "owner" field
+      { allow: owner, ownerField: "enrolled", operations: [read] }
+    ]
+  )
+{
+    id: ID!
+    date: Date!
+    orderID: String!
+    items: Int!
+    amount: Int!
+    status: LoginStatus!
+}
+
+# Code Management
+
+enum UsageType {
+    ONE_TIME
+    MULTIPLE_TIMES
+    # Add If any
+}
+
+type AffiliateCodes {
+    id: ID!
+    createdOn: Date!
+    code: String!
+    credits: Int!
+    validTill: Date!
+    usageType: UsageType!
+    active: Boolean! @default(value: "false")
+    redeemedBy: Date!
+}
+
+# Learner Management
+
+type LearnerManagement @model 
+@auth(
+    rules: [
+      { allow: owner } # Defaults to use the "owner" field
+      { allow: private, operations: [update, delete, read] }
+    ]
+  )
+{
+    id: ID!
+    name: String!
+    email: String!
+    mobileNumber: Int!
+    lastLogin: Date!
+    joinedOn: Date!
+    enabled: Boolean! @default(value: "false")
+    filter: [FilterBy]
+}
+
+# Profile Details
+
+type ProfileDeatils {
+    id: ID!
+    name: String!
+    email: String!
+    mobileNumber: Int!
+    role: Role!
+    state: SelectState!
+    language: Language!
+}
+
+# Admin Management
+
+enum AdminRole {
+    ADMIN
+    SUPERADMIN
+    # Add if any
+}
+
+type AdminManagement @model 
+@auth(
+    rules: [
+      { allow: owner } # Defaults to use the "owner" field
+      { allow: private, operations: [update, delete, read] }
+    ]
+  )
+{
+    id: ID!
+    name: String!
+    role: AdminRole!
+    email: String!
+    mobileNumber: Int!
+    lastLogin: Date!
+    joinedOn: Date!
+    enabled: Boolean! @default(value: "false")
+    filter: [FilterBy]
+}
+
+# Admin Profile
+
+type AdminProfile {
+    id: ID!
+    name: String!
+    role: AdminRole!
+    email: String!
+    mobileNumber: Int!
+    state: SelectState!
+    language: Language!
+}
+
+# Instructor Management
+
+type InstructorManagement @model 
+@auth(
+    rules: [
+      { allow: owner } # Defaults to use the "owner" field
+      { allow: private, operations: [update, delete, read] }
+    ]
+  )
+{
+    id: ID!
+    name: String!
+    email: String!
+    mobileNumber: Int!
+    lastLogin: Date!
+    joinedOn: Date!
+    enabled: Boolean! @default(value: "false")
+    filter: [FilterBy]
+}
+
+# Instructor Profile
+
+enum IsAllowed {
+    YES
+    NO
+}
+
+type InstructorProfile @model 
+@auth(
+    rules: [
+      { allow: owner } # Defaults to use the "owner" field
+      { allow: private, operations: [update, read] }
+    ]
+  )
+{
+    id: ID!
+    name: String!
+    email: String!
+    mobileNumber: Int!
+    role: Role!
+    assignCourse: String!
+    canEditPublishedCourse: IsAllowed!
+    needApprovalForPublishingCourses: IsAllowed!
+    accessOfLiveClassRecordings: IsAllowed!
+    accessOfSalesDashboard: IsAllowed!
+    accessOfMessenger: IsAllowed!
+    accessOfBandwidthReports: IsAllowed!
+    accessOfUsageReports: IsAllowed!
+    accessOfLiveTestsReports: IsAllowed!
+    accessOfLiveClassReports: IsAllowed!
+    accessOfLearnerDetails: IsAllowed!
+    accessToDownloadQuizOrLiveTest: IsAllowed!
+    accessOfEnrollLearnersInAnyCourse: IsAllowed!
+    state: SelectState!
+    language: Language!
+}
