@@ -1,87 +1,75 @@
-enum ListOfDepartments {
-
-Branding
-Sales
-Educare
-Content
-TechDevelopment
-
-
-}
-
-type Department
-  @model 
-  @auth (
-    rules: [
-      { allow: groups, groups: ["admin"], operations: [create, update, delete, read] }
-      { allow: private, operations: [read] }
-      { allow: public, operations: [read] }
-    ]
-  ) {
-  departmentId: ID!
-  name: String!
-  description: String
-  logoUri: String
-  createdAt: AWSDateTime
-  jobs: [Job] @hasMany(indexName: "DepartmentJobs", fields: ["departmentId"])
-}
-
 enum JobType {
-  FullTime
-  HalfTime
-  PartTime
-  Internship
+  Full_Time
+  Half_Time
+  Part_Time
+  Internship
 }
 
 enum JobLocation {
-  OnSite
-  Remote
-  Hybrid
+  Onsite
+  Remote
+  Hybrid
 }
 
-type Job
-  @model 
-  @auth (
-    rules: [
-      { allow: groups, groups: ["admin"], operations: [create, update, delete, read] }
-      { allow: private, operations: [read] }
-      { allow: public, operations: [read] }
-    ]
-  ) {
-  jobId: ID!
-  title: String!
-  description: String!
-  duties: String!
-  requirements: String!
-  niceToHave: String!
-  jobLocation: JobLocation!
-  location: String
-  jobType: JobType!
-  minSalary: Int
-  maxSalary: Int
-  currencyForSalary: String!
-  createdAt: AWSDateTime
-  department: Department! @belongsTo(fields: ["jobDepartmentId"])
-  jobDepartmentId: ID! @index(name: "DepartmentJobs", sortKeyFields: ["jobId"])
-  applicants: [Applicant] @hasMany(indexName: "jobApplicants", fields: ["jobId"])
+enum SalaryPeriod {
+  Mo
+  Yr
 }
 
-type Applicant
-  @model 
-  @auth (
-    rules: [
-      { allow: groups, groups: ["admin"], operations: [create, update, delete, read] }
-      { allow: private, operations: [read] }
-      { allow: public, operations: [read] }
-    ]
-  ) {
-  applicantId: ID!
-  name: String!
-  email: String!
-  mobile: String!
-  cover: String
-  resumeUri: String!
-  createdAt: AWSDateTime
-  job: Job! @belongsTo(fields: ["applicantJobId"])
-  applicantJobId: ID! @index(name: "jobApplicants", sortKeyFields: ["applicantId"])
+type Job @model @auth(rules: [{allow: groups, groups: ["admin"], operations: [create, update, delete, read]}, {allow: private, operations: [read]}, {allow: public, operations: [create, read]}]) {
+  jobId: ID!
+  title: String!
+  description: String!
+  duties: String!
+  requirements: String!
+  niceToHave: String!
+  jobLocation: JobLocation!
+  location: String
+  jobType: JobType!
+  minSalary: Int
+  maxSalary: Int
+  currencyForSalary: String!
+  salaryperiod: SalaryPeriod!
+  createdAt: AWSDateTime
+  department: Department! @belongsTo(fields: ["jobDepartmentId"])
+  jobDepartmentId: ID! @index(name: "DepartmentJobs", sortKeyFields: ["jobId"])
+  applicants: [Applicant] @hasMany(indexName: "JobApplicants", fields: ["jobId"])
+}
+
+type Applicant @model @auth(rules: [{allow: public, operations: [create, read]}, {allow: groups, groups: ["admin"], operations: [update, delete, read]}, {allow: private, operations: [read]}]) {
+  applicantId: ID!
+  name: String!
+  email: String!
+  mobile: String!
+  cover: String
+  address: String
+  country: String
+  city: String
+  resumeUri: String!
+  skills: [String]!
+  jobTitle: String!
+  jobType: JobType!
+  monthlyRate: Int!
+  comment: String
+  createdAt: AWSDateTime
+  job: Job! @belongsTo(fields: ["applicantJobId"])
+  applicantJobId: ID! @index(name: "JobApplicants", sortKeyFields: ["applicantId"])
+}
+
+enum DepartmentType {
+  BRANDING
+  SALES
+  EDUCARE
+  CONTENT
+  TECHDEVELOPMENT
+}
+
+type Department @model @auth(rules: [{allow: groups, groups: ["admin"], operations: [create, update, delete, read]}, {allow: private, operations: [read]}, {allow: public, operations: [create, read]}]) {
+  departmentId: ID!
+  name: String!
+  description: String
+  location: String!
+  logoUri: String
+  createdAt: AWSDateTime
+  jobs: [Job] @hasMany(indexName: "DepartmentJobs", fields: ["departmentId"])
 }
