@@ -57,6 +57,16 @@ type Job
   jobLocation: JobLocation!
   location: String
   jobType: JobType!
+  address: String!
+  skills: String!
+  dateOfBirth: Date!
+  city: String!
+  country: String!
+  postalCode: String!
+  github: String
+  linkedIn: String
+  experience: String!
+  projectLink: String
   minSalary: Int
   maxSalary: Int
   currencyForSalary: String!
