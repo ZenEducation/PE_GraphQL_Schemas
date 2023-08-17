@@ -93,3 +93,27 @@ type CRM_Contact
   campaignId: ID
   userId: String!
 }
+
+
+type Deals 
+  @model 
+  @auth(rules: [{ allow: public, operations: [create, read, update, delete] }]) {
+  id: ID!
+  dealName: String!
+  companyName: String!
+  summary: String!
+  amount: String!
+  currency: AWSJSON!
+  status: String!
+  pipeline: String!
+  stage: String!
+  source: String!
+  owner: String!
+  primaryContact: String!
+  weightedForecast: String!
+  probability: Int!
+  expectedClose: AWSDate!
+  revenueType: String!
+  dealPerformanceLane: String!
+  productInterest: String!
+}
