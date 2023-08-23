@@ -1,1 +1,68 @@
+# Student signup flow
+
+
+# Step 1 Basic Req:  first we take requirement (never discard worst case attach to IP)
+# Step 2 Signup: allow signup with needed data like phone etc
+# Step 3 Verify: Verify account [{student}, {parent/guardian/relative}, {mediator/company/others/mislaneous}]
+# Step 4 Detailed Req: time slots, prefernce, budget
+
+# Success Redirect to respective dashboard
+
+
+# ==============Step 1 Basic Req===========================
+
+# form fields
+# subjects -> multi select field
+# criculam/board -> CBSE+ JEE/ IB + NEET 
+# City and Area
+# Requirement details -> textbox with persons request for teaching
+# Name, location
+
+# ==============Step 2 Signup==============================
+
+# form fields
+# email -> verify right away
+# name
+# phone num
+# type of user -> [{student}, {parent/guardian/relative}, {mediator/company/others/mislaneous}]
+
+# ==============Step 3 Verify via email ===================
+# click and redirect to next page
+
+# ==============Step 4 Detailed Req ======================
+
+# Standards/Grade
+# Level (beg-L1/intermediate-L2/advanced-L3)
+
+# prefernce male/female/any (single select)
+
+# budget -> 
+#     full course (range)
+#     hourly
+
+# learning outcome sought (multi select)
+#     enahncing subject knowlegde
+#     enahncing grades and marks in general
+#     cracking entrance exams
+#     assignement help
+
+# learning outcome deadline
+#   single date or date range
+
+# free time slots (multi select)
+#   time of the day
+#   time of the week
+
+
+type Lead @model @auth(rules: [{ allow: owner }]) {
+  id: ID!
+  name: String!
+  email: String!
+  phone: String
+  company: String
+  notes: String
+  createdAt: AWSDateTime
+  updatedAt: AWSDateTime
+  owner: String
+}
 

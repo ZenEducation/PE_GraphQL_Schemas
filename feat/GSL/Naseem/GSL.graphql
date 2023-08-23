@@ -1,0 +1,419 @@
+#type of users 
+
+enum UserType{
+    Customer
+    Mediator
+    Employee
+}
+
+# AuthInfo correcponds to the user info that  have been stored in Cognito
+# Create a 1to1 relation with the User model
+type AuthInfo @model { 
+id: ID!
+email: [String]
+createdAt: [String]
+phoneNum: [String]
+updatedAt: [String]
+
+}
+
+#allowing crud opertion  to edit delete or create the details
+type User @auth(rules: [{ allow: owner, operations: [create, delete, update] }]) 
+@model
+  {
+    id: ID!
+    image: String
+    name: String!
+    email: String!
+    type: UserType!
+    address: String
+    pinCode: Int
+    mediatorInfo: Mediator @hasOne (fields: ["id"])
+    customerInfo: Customer @hasOne (fields: ["id"])
+    employeeInfo: Employee @hasOne (fields: ["id"])
+    premiumMembershipPlan: MembershipPlan
+    
+  }
+
+enum MembershipPlan{
+    Unlimited_Messages
+    Vip_badge
+    UnlimitedMatches
+    Take_more_messages
+}
+
+type Employee @model
+  @auth(rules: [{ allow: owner, operations: [create, delete, update] }])
+{
+  id: ID!
+  name: String!
+  email: String!
+  user: User! @belongsTo(fields: ["userId"])
+}
+
+type Mediator @model
+  @auth(rules: [{ allow: owner, operations: [create, delete, update] }])
+{
+  id: ID!
+  name: String!
+  email: String!
+  user: User! @belongsTo(fields: ["userId"])
+}
+
+type Customer @model
+  @auth(rules: [{ allow: owner, operations: [create, delete, update] }])
+{
+  id: ID!
+  name: String!
+  email: String!
+  user: User! @belongsTo(fields: ["userId"])
+}
+
+type UserProfile {
+    id: ID!
+    myGender: Gender
+    seekingGender: Gender
+    ageFrom: AgeRange
+    ageTo: AgeRange
+}
+
+enum Gender {
+    MAN
+    WOMEN
+    OTHER 
+}
+
+enum AgeRange {
+    AGE_18
+    AGE_20
+    AGE_24
+    AGE_30
+    AGE_35
+    AGE_40
+}
+
+# Sign up to recieve a monthly email on the latest news!
+
+type NewsletterSubscriber {
+    id: ID!
+    email: String!
+}
+
+#contact us
+
+type ContactMessage {
+  id: ID!
+  fullName: String!
+  email: String!
+  message: String!
+  createdAt: String!
+}
+
+
+#Home>setting>ProfileInfo
+
+
+type AboutYourProfile{
+    id: ID!
+    avatar_url: String
+    cover_url: String
+    name: String!
+    publicEmail: String!
+    description: String
+    country: Country
+    city: City
+    birthday: Date
+    occupation: String
+    martialStatus: Martial_Status
+    birthPlace: String
+}
+
+enum Country{
+    United_States_Of_America
+    India
+    Japan
+    England
+    France
+    #add more countries as needed
+    #....
+}
+
+enum City{
+    New_York
+    Paris
+    #add more city as needed
+    #....
+}
+
+enum Martial_Status{
+    In_A_Relationship
+    Single
+    Married
+}
+
+
+# Interests
+
+type Interests{
+    id: ID!
+    Favorite_TV_Shows: String
+    Favorite_MusicBands_Or_Artists: String
+    Favorite_Movies: String
+    Favorite_Games: String
+}
+
+
+#Jobs & Education
+
+type Jobs_And_Education{
+    id: ID!
+    title: String
+    yearStarted: Int
+    yearEnded: Int
+    description: String
+
+}
+
+
+# Notifications
+#Choose when and how to be notified
+
+type Notifications{
+    id: ID!
+    subscription: Boolean @default(value: "false")
+    recommended: Boolean @default(value: "false")
+    comments: Boolean @default(value: "false")
+    reply_To_My_Comments: Boolean @default(value: "false")
+    tags: Boolean @default(value: "false")
+    friendRequests: Boolean @default(value: "false")
+    groups: Boolean @default(value: "false")
+    events: Boolean @default(value: "false")
+    Send_Me_Emails_About_Peyamba: Boolean @default(value: "false")
+    Promotional_And_Helpful_Recommendations: Boolean @default(value: "false")
+}
+
+
+# Friend Requests
+type FriendRequests{
+    id: ID!
+    profilePic_url: String
+    name: String
+    age: Int
+    location: String 
+    status: FriendRequestStatus!
+}
+
+enum FriendRequestStatus{
+    Accept
+    Ignore
+}
+
+type FindFriend{
+    id: ID!
+    name: String!
+    gender: Gender!
+    seekingGender: Gender!
+    age_From: Int!
+    age_To: Int!
+    country: Country
+}
+
+
+# Account > Account Info
+
+type Account_Info{
+    id: ID!
+    name: String
+    publicEmail: String
+    country: Country
+    city: City
+    #securitInfo
+    recoveryEmail: String
+    recoveryPhone: Int
+    securityQuestion1: SecurityQuestion
+    securityAnswer1: String
+    securityQuestion2: SecurityQuestion
+    securityAnswer2: String
+}
+
+enum SecurityQuestion{
+    What_is_your_favorite_color
+    What_is_your_favorite_movie
+}
+
+# privacy setting
+
+type PrivacySetting{
+    id: ID!
+    Who_can_see_your_profile: Privacy_Setting
+    Who_can_send_a_Friend_Request: Privacy_Setting
+}
+
+enum Privacy_Setting{
+    Everyone
+    Members_Only
+    Friends_Only
+}
+
+# billing & payout
+
+type paymentInfo{
+    name: String
+    publicEmail: String
+    country: Country
+    city: City
+    phone: Int
+    email: String
+    paymentOption: PaymentOption
+
+    #card deatils
+    cardNumber: Int
+    nameOnCard: String
+    expiration: Int
+    cvv: Int
+}
+
+enum PaymentOption{
+    Credit_Card
+    Debit_Card
+    Paypal
+}
+
+# View purchase history
+
+type PurchaseHistory{
+    date: String!
+    item: String!
+    type: String!
+    code: String!
+    price: Float!
+}
+
+
+# community
+
+type Post @model @auth(rules: [{ allow: owner, operations: [create, delete, update] }])
+{
+    id: ID!
+    profilePic_url: String
+    content: String!
+    author: Community_User!
+    attachments_url: String
+    tag: Tag
+    timestamp: String!
+    comments: [Comment!]!
+}
+
+enum Tag{
+    ALL
+    NEW
+    OLD
+    POPULAR
+}
+
+type Comment {
+    id: ID!
+    content: String!
+    author: Community_User!
+    timestamp: String!
+}
+
+type Community_User {
+  id: ID!
+  name: String
+  username: String!
+}
+
+
+# Blog
+
+type BlogPost @model
+  @auth(rules: [{ allow: owner, operations: [create, delete, update] }])
+{
+  id: ID!
+  title: String!
+  content: String!
+  author: Community_User!
+  publishedAt: String!
+  comments: [Comment!]!
+  shareCounts: Int!
+  blogTags: Blog_tags
+}
+
+enum Blog_tags{
+    Tickets
+    Comming_Soon
+    Movies
+    #add if needed
+    #...
+}
+
+# Profile
+ 
+type User_Profile @model
+  @auth(rules: [{ allow: owner, operations: [create, delete, update] }])
+{
+    id: ID!
+    name: String
+    birthday: Date
+    gender: Gender
+    martialStatus: Martial_Status
+    country: Country
+    city: City
+    myselfSummary: String
+    likeCount: Int
+    photos_url: [String]
+    #lifestyle
+    interest: Interests
+    lookingFor: String
+    smoking: String
+    language: SelectLanguage
+    #physical
+    height: Float
+    weight: Int
+    hairColor: HairColor
+    eyecolor: EyeColor
+    bodyType: BodyType
+    Ethinicity: Ethnicity
+}
+
+enum SelectLanguage{
+    English
+    Spanish
+    Hindi
+    #add more if needed
+}
+
+enum HairColor {
+  BLACK
+  BROWN
+  BLONDE
+  RED
+  OTHER
+}
+
+enum EyeColor {
+  BLUE
+  BROWN
+  GREEN
+  HAZEL
+  OTHER
+}
+
+enum Ethnicity {
+  ASIAN
+  BLACK
+  HISPANIC
+  WHITE
+  OTHER
+}
+
+enum BodyType {
+  SLIM
+  ATHLETIC
+  AVERAGE
+  CURVY
+  MUSCULAR
+  TALL
+  OTHER
+}

@@ -1,52 +1,16 @@
-enum examQuestionType {
-
-singleAnswerMCQ
-multipleAnswerMCQ
-TrueOrFalse
-IntegerType
-NumericalFloatingPointType
-
+enum Exam_QuestionType {
+  MultipleAnswerMCQ
+  TrueOrFalse
+  IntegerType
+  NumericalFloatingPointType
 }
-
-type MCQ @model{
-    id: ID!
-    examsID: ID @index(name: "MCQByExam")
-    quizId: ID @index(name: "MCQByQuiz")
-    question: String
-    imageUrl: String
-    points: Int
-    options: [Option]! @hasMany(indexName: "optionsByMCQ")
-}
-type Option @model{#this fits for both multi-correct and single-correct quiz
-    id: ID!
-    MCQid: ID! @index(name: "optionsByMCQ")
-    key: Int#to saperately identify the different options.
-    content: String!
-    val: Boolean!
-}
-
-type MCQResponses @model {
-  id: ID!
-  userId : ID! @index(name: "useChapterResponses", sortKeyFields: ["chapterId"]) @index(name: "userExamResponses", sortKeyFields: ["examId"])
-  chapterId: ID 
-  examId: ID 
-  MCQId: ID!
-  MCQ: MCQ @hasOne
-  response: [Int]#will only contain keys options where student marked true
-}
-
-type ExamQuizResponses @model {
-  userId: ID!
-  chapterId: ID
-  examId: ID
-  chapter: [MCQResponses] @hasMany(indexName: "userChapterResponses", fields: ["userId", "chapterId"])
-  chapters: [MCQResponses] @hasMany(indexName: "userChapterResponses", fields: ["userId"])
-  exam: [MCQResponses] @hasMany(indexName: "userExamResponses", fields: ["userId", "examId"])
-  exams: [MCQResponses] @hasMany(indexName: "userExamResponses", fields: ["userId"])
-  totalScore: Int
-}
-
-type Exam @model
+type Exam @model 
+@auth(
+    rules: [
+      { allow: owner } # Defaults to use the "owner" field
+      { allow: owner, ownerField: "enrolled", operations: [read] }
+    ]
+  )
 {
   id: ID!
   name: String!
@@ -57,6 +21,76 @@ type Exam @model
   attempted: [Student] @manyToMany(relationName: "examsAttemped")
   questions: Int
   passingMarks: Int
-  MCQs: [MCQ] @hasMany(indexName: "MCQByExam")
+  questions: [Exam_Question] @hasMany(indexName: "QuestionByExam")
 }
+
+type Exam_Question @model 
+@auth(
+    rules: [
+      { allow: owner } # Defaults to use the "owner" field
+      { allow: private, operations: [update, read] }
+    ]
+  )
+{
+  id: ID!
+  examsID: ID @index(name: "QuestionByExam")
+  question: String
+  imageUrl: String #question can also include image or question can be in the form of image
+  points: Int
+  type: Exam_QuestionType
+  options: [Exam_Option]! @hasMany(indexName: "optionsByQuestion")#for single and multiple choice questions
+  trueFalse: Boolean
+  integerType: Int
+  floatingPoint: Float
+}
+type Exam_Option @model 
+@auth(
+    rules: [
+      { allow: owner } # Defaults to use the "owner" field
+      { allow: private, operations: [read] }
+    ]
+  )
+{ #this fits for both multi-correct and single-correct quiz
+  id: ID!
+  questionId: ID! @index(name: "optionsByQuestion")
+  key: Int #to separately identify the different options.
+  image: String #if user contains image
+  content: String!
+  val: Boolean @default(value: "false") #default value should be in double quotes even for boolean:amplify-issue
+}
+
+type Exam_Response @model 
+@auth(
+    rules: [
+      { allow: owner } # Defaults to use the "owner" field
+      { allow: private, operations: [update, read] }
+    ]
+  )
+{
+  userId: ID!
+  examId: ID
+  exam: [Exam_Question_Response]
+    @hasMany(indexName: "userExamResponses", fields: ["userId", "examId"])
+  totalScore: Int
+}
+
+type Exam_Question_Response @model 
+@auth(
+    rules: [
+      { allow: owner } # Defaults to use the "owner" field
+      { allow: private, operations: [update, read] }
+    ]
+  )
+  {
+  id: ID!
+  userId: ID! @index(name: "userExamResponses", sortKeyFields: ["examId"])
+  examId: ID
+  questionId: ID!
+  question: Exam_Question @hasOne(fields: ["questionId"])
+  trueFalse: Boolean
+  integerType: Int
+  floatingPoint: Float
+  response: [Int] #will only contain keys options where student marked true
+}
+
 
